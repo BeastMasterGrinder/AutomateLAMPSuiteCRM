@@ -1,0 +1,72 @@
+#in downloads folder where the xampp .run file and suitecrm zip is
+sudo chmod +x xampp-linux-...installer.run
+
+#run the installer
+sudo ./xampp-linux-x64-*-installer.run
+
+#move the suitecrm zip file
+sudo mv SuiteCRM-X.X.X.zip /opt/lampp/htdocs/
+
+cd /opt/lampp/htdocs
+
+#remove the suitecrm zip file
+sudo rm -r SuiteCRM-X.X.X.zip
+
+#Configure php and xdebug
+nano ~/.bashrc
+
+export PATH="/opt/lampp/bin:$PATH"
+source ~/.bashrc
+
+#installing xdebug
+wget https://xdebug.org/files/xdebug-3.3.2.tgz
+
+tar -xvzf xdebug-3.3.2.tgz
+cd xdebug-3.3.2
+
+#get the tools
+sudo apt-get update
+sudo apt-get install autoconf automake libtool
+
+
+phpize
+
+./configure --enable-xdebug
+
+make
+
+sudo make install
+
+
+
+ls /opt/lampp/lib/php/extensions/no-debug-non-zts-xxxxxx/
+sudo nano /opt/lampp/etc/php.ini
+#copy this at the end of the php.ini
+[xdebug]
+zend_extension=xdebug.so
+xdebug.mode=debug
+xdebug.start_with_request=yes
+xdebug.client_host=127.0.0.1
+xdebug.client_port=9003
+
+
+sudo /opt/lampp/lampp restart
+
+
+#in vscode Debug: Open 'launch.json'
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "log": true,  // Optional: Enables Xdebug logging
+      "pathMappings": {
+        "/opt/lampp/htdocs": "${workspaceFolder}"  // Adjust path mappings as needed
+      }
+    }
+  ]
+}
+
