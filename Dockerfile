@@ -15,7 +15,9 @@ RUN apt-get update && \
     nano \
     php-pear \
     php-dev \
-    php-cli
+    php-cli \
+    net-tools \
+    systemctl
 
 # Download and install XAMPP
 RUN wget -O /tmp/xampp-installer.run "https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/8.2.12/xampp-linux-x64-8.2.12-0-installer.run/download?use_mirror=yer" && \
