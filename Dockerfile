@@ -9,48 +9,44 @@ RUN apt-get update && \
     apt-get install -y \
     wget \
     unzip \
-    apache2 \
-    mysql-server \
-    php \
-    php-mysql \
-    php-xml \
-    php-mbstring \
-    php-zip \
-    php-cli \
-    php-dev \
     autoconf \
     automake \
     libtool \
-    git
+    nano
 
-# Install Xdebug
-RUN wget https://xdebug.org/files/xdebug-3.3.2.tgz && \
-    tar -xvzf xdebug-3.3.2.tgz && \
-    cd xdebug-3.3.2 && \
+# Download and install XAMPP
+RUN wget -O /tmp/xampp-installer.run "https://sourceforge.net/projects/xampp/files/XAMPP%20Linux/8.2.12/xampp-linux-x64-8.2.12-0-installer.run/download?use_mirror=yer" && \
+    chmod +x /tmp/xampp-installer.run && \
+    /tmp/xampp-installer.run --mode unattended && \
+    rm /tmp/xampp-installer.run
+
+# Download and install SuiteCRM
+RUN wget https://github.com/salesagility/SuiteCRM-Core/releases/download/v8.2.1/SuiteCRM-8.2.1.zip -O /tmp/SuiteCRM-8.2.1.zip && \
+    unzip /tmp/SuiteCRM-8.2.1.zip -d /opt/lampp/htdocs/ && \
+    rm /tmp/SuiteCRM-8.2.1.zip && \
+    chown -R daemon:daemon /opt/lampp/htdocs/SuiteCRM-7.11.23 && \
+    chmod -R 755 /opt/lampp/htdocs/SuiteCRM-7.11.23
+
+# Configure PHP and Xdebug
+RUN echo 'export PATH="/opt/lampp/bin:$PATH"' >> ~/.bashrc && \
+    source ~/.bashrc && \
+    wget https://xdebug.org/files/xdebug-3.3.2.tgz -O /tmp/xdebug-3.3.2.tgz && \
+    tar -xvzf /tmp/xdebug-3.3.2.tgz -C /tmp && \
+    cd /tmp/xdebug-3.3.2 && \
     phpize && \
     ./configure --enable-xdebug && \
     make && \
     make install && \
-    echo "zend_extension=$(find /usr/local/lib/php/extensions -name xdebug.so)" >> /etc/php/7.4/apache2/php.ini && \
-    echo "xdebug.mode=debug" >> /etc/php/7.4/apache2/php.ini && \
-    echo "xdebug.start_with_request=yes" >> /etc/php/7.4/apache2/php.ini && \
-    echo "xdebug.client_host=127.0.0.1" >> /etc/php/7.4/apache2/php.ini && \
-    echo "xdebug.client_port=9003" >> /etc/php/7.4/apache2/php.ini && \
-    cd .. && rm -rf xdebug-3.3.2 xdebug-3.3.2.tgz
-
-# Install SuiteCRM
-RUN wget https://suitecrm.com/files/165/SuiteCRM-7.11.23/SuiteCRM-7.11.23.zip && \
-    unzip SuiteCRM-7.11.23.zip -d /var/www/html/ && \
-    rm SuiteCRM-7.11.23.zip && \
-    chown -R daemon:daemon /var/www/html/SuiteCRM-7.11.23 && \
-    chmod -R 755 /var/www/html/SuiteCRM-7.11.23
-
-# Configure Apache
-COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
-RUN a2enmod rewrite && service apache2 restart
+    echo "[xdebug]" >> /opt/lampp/etc/php.ini && \
+    echo "zend_extension=$(find /opt/lampp/lib/php/extensions -name xdebug.so)" >> /opt/lampp/etc/php.ini && \
+    echo "xdebug.mode=debug" >> /opt/lampp/etc/php.ini && \
+    echo "xdebug.start_with_request=yes" >> /opt/lampp/etc/php.ini && \
+    echo "xdebug.client_host=127.0.0.1" >> /opt/lampp/etc/php.ini && \
+    echo "xdebug.client_port=9003" >> /opt/lampp/etc/php.ini && \
+    rm -rf /tmp/xdebug-3.3.2 /tmp/xdebug-3.3.2.tgz
 
 # Expose ports
 EXPOSE 80 3306 9003
 
-# Start Apache and MySQL
-CMD ["sh", "-c", "service mysql start && apache2ctl -D FOREGROUND"]
+# Start XAMPP
+CMD ["/opt/lampp/lampp", "start"]
