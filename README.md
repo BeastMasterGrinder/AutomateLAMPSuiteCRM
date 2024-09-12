@@ -67,4 +67,4 @@ docker rm my-lamp-container
 - The SuiteCRM application is downloaded and installed in /var/www/html/SuiteCRM-7.11.23.
 - Apache is configured to serve SuiteCRM and allow overrides for .htaccess files.
 
-Feel free to customize the configuration files as needed for your specific use case.
+Customize the configuration files as needed for your specific use case.

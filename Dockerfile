@@ -42,7 +42,7 @@ RUN wget https://xdebug.org/files/xdebug-3.3.2.tgz && \
 RUN wget https://suitecrm.com/files/165/SuiteCRM-7.11.23/SuiteCRM-7.11.23.zip && \
     unzip SuiteCRM-7.11.23.zip -d /var/www/html/ && \
     rm SuiteCRM-7.11.23.zip && \
-    chown -R www-data:www-data /var/www/html/SuiteCRM-7.11.23 && \
+    chown -R daemon:daemon /var/www/html/SuiteCRM-7.11.23 && \
     chmod -R 755 /var/www/html/SuiteCRM-7.11.23
 
 # Configure Apache
